@@ -1,5 +1,7 @@
 FROM microsoft/dotnet:2.1-sdk AS builder
 
+EXPOSE 10990
+
 ARG sc=/DotNetty.Repro.Server
 
 # copy project files to image
