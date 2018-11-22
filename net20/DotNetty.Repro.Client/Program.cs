@@ -22,8 +22,17 @@ namespace DotNetty.Repro.Client
 
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNETTY_REPRO_HOST")))
             {
-                Console.WriteLine("Connected to host {0}", Environment.GetEnvironmentVariable("DOTNETTY_REPRO_HOST"));
-                host = new DnsEndPoint(Environment.GetEnvironmentVariable("DOTNETTY_REPRO_HOST"), 1099);
+                var hostname = Environment.GetEnvironmentVariable("DOTNETTY_REPRO_HOST");
+                Console.WriteLine("Connected to host {0}", hostname);
+                host = new DnsEndPoint(hostname, 1099);
+
+                // debug - enumerate all hostnames resolved
+                Dns.GetHostAddressesAsync(hostname)
+                    .ContinueWith(tr =>
+                    {
+                        foreach(var r in tr.Result)
+                            Console.WriteLine("Found entry for {0} {1}", hostname, r);
+                    });
             }
             else
             {
