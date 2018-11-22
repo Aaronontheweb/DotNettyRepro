@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  echo.server:
+    image: echo.server21
+    build:
+      context: .
+      dockerfile: DotNetty.Repro.Server/Dockerfile
+    ports:
+      - '10990:10990'
+
+  echo.client:
+    image: echo.client21
+    build:
+      context: .
+      dockerfile: DotNetty.Repro.Client/Dockerfile
+    environment:
+      DOTNETTY_REPRO_HOST: echo.server
+    depends_on:
+      - "echo.server"
