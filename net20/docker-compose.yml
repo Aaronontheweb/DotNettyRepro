@@ -2,7 +2,7 @@ version: '3'
 
 services:
   echo.server:
-    image: echo.server
+    image: echo.server20
     build:
       context: .
       dockerfile: DotNetty.Repro.Server/Dockerfile
@@ -10,7 +10,7 @@ services:
       - '1099:1099'
 
   echo.client:
-    image: echo.client
+    image: echo.client20
     build:
       context: .
       dockerfile: DotNetty.Repro.Client/Dockerfile

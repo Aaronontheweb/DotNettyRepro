@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using DotNetty.Handlers.Logging;
 using DotNetty.Transport.Bootstrapping;
@@ -50,14 +51,16 @@ namespace DotNetty.Repro.Server
                 .Handler(new LoggingHandler("SRV"))
                 .ChildHandler(new ServerHandler());
 
-            IChannel boundChannel = bootstrap.BindAsync(1099).Result;
+            IChannel boundChannel = bootstrap.BindAsync(IPAddress.Any, 1099).Result;
+            Console.WriteLine("Bound to {0}", boundChannel.LocalAddress);
 
-            Console.ReadLine();
+            Console.CancelKeyPress += (sender, eventArgs) => boundChannel.CloseAsync();
 
-            boundChannel.CloseAsync().Wait();
-           Task.WhenAll(
-                bossGroup.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1)),
-                workerGroup.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1))).Wait(TimeSpan.FromMilliseconds(3000));
+            boundChannel.CloseCompletion.Wait();
+            Console.WriteLine("Channel terminated");
+            Task.WhenAll(
+                 bossGroup.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1)),
+                 workerGroup.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1))).Wait(TimeSpan.FromMilliseconds(3000));
         }
     }
 }
