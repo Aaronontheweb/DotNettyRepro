@@ -18,15 +18,16 @@ namespace DotNetty.Repro.Client
             var group = new MultithreadEventLoopGroup();
 
 
-            IPAddress host = null;
+            EndPoint host = null;
 
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNETTY_REPRO_HOST")))
             {
-                host = Dns.GetHostAddressesAsync(Environment.GetEnvironmentVariable("DOTNETTY_REPRO_HOST")).Result.FirstOrDefault();
+                Console.WriteLine("Connected to host {0}", Environment.GetEnvironmentVariable("DOTNETTY_REPRO_HOST"));
+                host = new DnsEndPoint(Environment.GetEnvironmentVariable("DOTNETTY_REPRO_HOST"), 1099);
             }
             else
             {
-                host = IPAddress.Parse("127.0.0.1");
+                host = new DnsEndPoint("localhost", 1099);
             }
 
             var bootstrap = new Bootstrap();
@@ -42,7 +43,7 @@ namespace DotNetty.Repro.Client
                     pipeline.AddLast(new DiscardClientHandler());
                 }));
 
-            IChannel bootstrapChannel = bootstrap.ConnectAsync(host, 1099).Result;
+            IChannel bootstrapChannel = bootstrap.ConnectAsync(host).Result;
 
             Console.CancelKeyPress += (sender, eventArgs) => bootstrapChannel.CloseAsync();
 
